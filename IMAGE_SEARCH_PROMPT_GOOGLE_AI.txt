@@ -1,0 +1,123 @@
+MASTER PROMPT — mencari foto eksisting untuk Morphological Loadout
+
+Saya sedang membuat interactive morphological chart / “RPG loadout builder” untuk proyek desain produk: Integrated Muslim-Friendly Public Urinal. Saya TIDAK ingin gambar hasil generative AI. Saya ingin FOTO / RENDER / FIGURE EKSISTING dari internet yang benar-benar sudah ada dan secara visual paling representatif untuk setiap opsi mekanisme berikut.
+
+TUJUAN VISUAL
+- Foto akan dipakai sebagai thumbnail square 1:1 di UI.
+- Pengguna harus bisa memahami mekanisme hanya dengan melihat gambarnya, bahkan sebelum membaca nama.
+- Prioritaskan gambar produk utuh atau close-up mekanisme yang jelas, perspektif 3/4 atau front-perspective, resolusi tinggi, tidak terlalu banyak teks, dan mudah di-crop menjadi persegi.
+- Untuk komponen yang merupakan hipotesis desain dan tidak punya produk persis, cari PRECEDENT TERDEKAT yang benar-benar eksis. Labeli jelas “closest precedent / analogy”, jangan berpura-pura itu contoh exact.
+- Jangan generate gambar baru.
+- Jangan gunakan gambar yang tidak relevan hanya agar daftar penuh.
+
+PRIORITAS SUMBER
+1. Manufacturer / official product page
+2. Paper / research project / university page
+3. Patent / technical catalog / credible distributor
+4. Architecture / restroom case study yang fotonya jelas
+5. Marketplace hanya bila tidak ada sumber yang lebih baik
+
+UNTUK SETIAP KOMPONEN, BERIKAN 3 KANDIDAT bila memungkinkan:
+A. Nama komponen
+B. Thumbnail/gambar yang ditemukan
+C. Nama produk/proyek asli di gambar
+D. URL halaman sumber (bukan hanya URL gambar jika memungkinkan)
+E. Mengapa gambar itu representatif untuk mekanisme tersebut (1 kalimat)
+F. Status: EXACT / CLOSE PRECEDENT / ANALOGY
+G. Saran crop square: bagian apa yang harus tetap terlihat
+
+JANGAN fokus dulu pada lisensi pemakaian presentasi; tahap ini adalah visual research dan reference board. Namun jangan hilangkan link sumber agar bisa diverifikasi lagi nanti.
+
+DAFTAR KOMPONEN
+
+1) BASIN PROFILE
+- Optimized Conventional — urinal wall-hung komersial modern yang compact/familiar.
+- Deep Basin — basin urinal lebih dalam dengan sidewall yang jelas untuk containment.
+- Cornucopia-derived — desain urinal Cornucopia dari riset University of Waterloo / PNAS Nexus 2025; cari render/foto bentuk urinal utuh, bukan grafik sudut.
+- Nautilus-derived — desain urinal Nautilus dari riset University of Waterloo / PNAS Nexus 2025; cari render/foto bentuk urinal utuh yang jelas.
+- Half / Floor-Stall — urinal half-stall atau floor-stall dengan receiving envelope besar.
+
+2) FRONT LIP
+- Conventional Lip — bibir depan urinal konvensional.
+- Extended Lip — urinal dengan front lip/projection yang memanjang mendekati pengguna.
+- Low Sweeping Lip — lip depan rendah dengan sweep/projection halus.
+- Asymmetric Capture — basin/lip asimetris yang menangkap aliran di satu arah; bila tidak ada exact, cari sanitary fixture dengan asymmetric receiving lip yang jelas.
+
+3) IMPACT ZONE
+- Smooth Concave — permukaan impact urinal halus dan cekung.
+- Guided Trough — alur/trough internal yang mengarahkan cairan ke drain.
+- Integrated Rib — rib/groove terpadu pada permukaan sanitaryware untuk mengarahkan flow.
+- Honeycomb-inspired Zone — texture/insert urinal anti-splash honeycomb/hex yang jelas secara visual.
+
+4) AIM GUIDANCE
+- No Cue — urinal tanpa target visual.
+- Graphic Target — urinal dengan fly sticker / target graphic yang nyata.
+- Embossed Target — target timbul/relief pada urinal atau anti-splash target product.
+- Concavity Cue — cekungan lokal sebagai zona target.
+- Geometry-defined — bentuk basin sendiri secara visual mengarahkan area aim, tanpa sticker.
+
+5) RESIDUAL SPLASH CONTROL
+- None — urinal tanpa screen/catcher tambahan.
+- Bristle / Spike — urinal anti-splash screen dengan spikes/bristles yang jelas.
+- Web / Honeycomb — urinal screen dengan web/hex/honeycomb.
+- Deep Sidewall — urinal dengan sidewalls/deep rim untuk containment.
+- Splash Wing — wing/shield di samping urinal untuk splash/privacy.
+
+6) ISTINJA / PERSONAL CLEANSING
+- Fixed Spout — urinal dengan fixed hygiene/istinja spout.
+- Protected Spout — hygiene spout yang terlindung dari contamination zone.
+- Recessed Spout — spout yang masuk/recessed ke body urinal.
+- Fold / Retract Spout — retractable/folding cleansing nozzle; kalau exact urinal sulit, cari sanitary cleansing fixture dengan mekanisme retractable yang relevan.
+- Handheld Spray — urinal/public restroom dengan handheld bidet/shattaf di sampingnya.
+
+7) ACTIVATION
+- Manual Button — flush/cleansing push button.
+- Wave Sensor — touchless hand-wave sensor.
+- Presence Sensor — automatic urinal presence sensor.
+- Timed Sequence — electronic timed valve/flush controller; cari visual hardware yang mudah dipahami.
+- Foot Control — sanitary foot pedal / foot-operated water control.
+
+8) FLUSH / RINSE
+- Washout / Washdown urinal
+- Touchless Washout urinal
+- Low-flow Rinse urinal
+- Siphon System urinal
+- Waterless Urinal (untuk konsep urine handling terpisah dari cleansing water)
+
+9) PRIVACY
+- None — urinal tanpa divider.
+- Shallow Wing — small/local privacy wing dekat fixture.
+- Deep Integrated Wing — side panel/wing yang besar dan terasa menyatu dengan fixture.
+- Divider Interface — urinal dengan partition/divider yang jelas.
+- Full Cubicle Mode — urinal individual dalam cubicle/alcove.
+
+10) POSITIONING
+- No Cue — tidak ada stance cue.
+- Floor Cue — floor graphic/material marker yang menunjukkan posisi berdiri.
+- Toe Recess — recessed toe-space atau geometry yang memberi ruang kaki dekat fixture.
+- Front-Lip Cue — front lip yang jelas menunjukkan seberapa dekat pengguna berdiri.
+- Geometry-induced Proximity — bentuk urinal yang secara natural memaksa/mengundang pengguna berdiri lebih dekat.
+- Standing Tray — urinal standing tray / grated step seperti school trough urinal / Maxi-Step / Superstep precedent.
+
+11) DRAIN
+- Central Drain — drain di tengah basin urinal.
+- Rear Drain — drain di bagian belakang basin.
+- Concealed Channel — concealed/internal drainage channel.
+- Linear Drain — linear drain/channel yang jelas.
+
+12) SERVICE ACCESS
+- Rear Access — service plumbing dari belakang/wall side.
+- Top Access — access panel/valve dari atas.
+- Removable Front — removable front/service panel pada sanitary fixture.
+- Side / Rear Panel — side/rear maintenance panel.
+
+CARA KERJA AGAR TIDAK OVERLOAD
+Jangan cari seluruh daftar sekaligus bila kualitas akan turun. Kerjakan dalam 4 batch:
+Batch 1 = Basin Profile + Front Lip + Impact Zone
+Batch 2 = Aim Guidance + Residual Splash + Istinja
+Batch 3 = Activation + Flush/Rinse + Privacy
+Batch 4 = Positioning + Drain + Service Access
+
+Mulai dari BATCH 1 saja. Setelah selesai, berhenti dan tunggu saya mengatakan “lanjut batch 2”.
+
+PENTING: Saya lebih memilih 1 gambar yang sangat tepat daripada 3 gambar yang salah. Jika sebuah konsep terlalu abstrak untuk memiliki foto exact, katakan dengan jujur dan berikan closest precedent terbaik.
