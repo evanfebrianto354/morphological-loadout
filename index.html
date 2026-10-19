@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Morphological Loadout V0.5.4</title>
+<title>Morphological Loadout V0.6.0</title>
 <style>
 :root{
  --bg:#ecf1f4; --panel:#ffffff; --line:#dbe3e8; --ink:#0f2137; --muted:#6f7f8d; --cyan:#16afd0; --cyan-soft:#e6f8fc; --navy:#11233d; --shadow:0 12px 28px rgba(13,31,53,.08); --radius:16px;
@@ -73,7 +73,7 @@ button,input,textarea,select{font:inherit} button{cursor:pointer}
 /* COMPACT = exactly like the visual reference:
    type header on top, square image directly below, no inset card, no component name. */
 .slots.compact{
-  grid-template-rows:repeat(6,minmax(0,1fr));
+  grid-template-rows:repeat(4,minmax(0,1fr));
   overflow:hidden;
 }
 .slots.compact .slot{
@@ -152,10 +152,10 @@ button,input,textarea,select{font:inherit} button{cursor:pointer}
 /* DETAILED keeps the same narrow column width.
    It adds the component name below the same edge-to-edge square image. */
 .slots.detailed{
-  grid-auto-rows:max-content;
-  overflow:auto;
-  align-content:start;
-  gap:7px 6px;
+  grid-template-rows:repeat(4,minmax(0,1fr));
+  overflow:hidden;
+  align-content:stretch;
+  gap:6px;
 }
 .slots.detailed .slot{
   border:0;
@@ -166,7 +166,7 @@ button,input,textarea,select{font:inherit} button{cursor:pointer}
   text-align:left;
   min-height:0;
   display:grid;
-  grid-template-rows:18px auto 19px;
+  grid-template-rows:17px minmax(0,1fr) 19px;
   gap:0;
   box-shadow:none;
 }
@@ -201,6 +201,7 @@ button,input,textarea,select{font:inherit} button{cursor:pointer}
   position:relative;
   width:100%;
   aspect-ratio:1 / 1;
+  max-height:100%;
   border:0;
   border-radius:0;
   overflow:hidden;
@@ -245,7 +246,7 @@ button,input,textarea,select{font:inherit} button{cursor:pointer}
 .publish-note{font-size:8px;color:var(--muted);line-height:1.45;margin-top:7px}
 
 @media(max-width:1200px){.main{grid-template-columns:minmax(300px,.9fr) 246px minmax(440px,1.18fr)}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.radarwrap{grid-template-columns:1fr}.stats-top,.matrix{grid-template-columns:1fr}.quickstats{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:920px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.main{display:flex;flex-direction:column}.left{grid-template-rows:380px auto}.slots-panel{max-height:420px}.slots{grid-template-columns:repeat(2,minmax(112px,1fr))}.slots.compact{grid-template-rows:repeat(6,minmax(0,1fr))}.slots.detailed{grid-auto-rows:max-content}.workspace{max-height:none}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail,.stats-top{grid-template-columns:1fr}.buildinfo{grid-template-columns:1fr}.quickstats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:920px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.main{display:flex;flex-direction:column}.left{grid-template-rows:380px auto}.slots-panel{max-height:420px}.slots{grid-template-columns:repeat(2,minmax(112px,1fr))}.slots.compact{grid-template-rows:repeat(4,minmax(0,1fr))}.slots.detailed{grid-auto-rows:max-content}.workspace{max-height:none}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail,.stats-top{grid-template-columns:1fr}.buildinfo{grid-template-columns:1fr}.quickstats{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head><body>
 <div class="app">
@@ -272,7 +273,7 @@ button,input,textarea,select{font:inherit} button{cursor:pointer}
         </div>
         <div class="buildedit">
           <div style="display:flex;justify-content:flex-end"><button class="btn" id="editBuildBtn">Edit</button></div>
-          <div class="quickstats"><div class="q"><b id="scoreQuick">0</b><span>Selection Score</span></div><div class="q"><b id="equippedQuick">0/12</b><span>Slots Equipped</span></div><div class="q" title="Jumlah komponen yang didukung langsung oleh sumber riset/paper."><b id="researchQuick">0/12</b><span>Research-backed</span></div></div>
+          <div class="quickstats"><div class="q"><b id="scoreQuick">0</b><span>Selection Score</span></div><div class="q"><b id="equippedQuick">0/8</b><span>Slots Equipped</span></div><div class="q" title="Jumlah komponen yang didukung langsung oleh sumber riset/paper."><b id="researchQuick">0/8</b><span>Research-backed</span></div></div>
         </div>
       </div>
     </section>
@@ -295,72 +296,75 @@ button,input,textarea,select{font:inherit} button{cursor:pointer}
 <div class="modalroot" id="modalRoot"></div><div class="toast" id="toast"></div>
 
 <script>
-const SLOTS=[['basin','Basin Profile'],['frontLip','Front Lip'],['impact','Impact Zone'],['aim','Aim Guidance'],['residual','Residual Splash'],['istinja','Istinja'],['activation','Activation'],['flush','Flush / Rinse'],['privacy','Privacy'],['position','Positioning'],['drain','Drain'],['service','Service Access']];
+const SLOTS=[
+  ['basin','Basin'],
+  ['aim','Aim'],
+  ['residual','Residual Splash'],
+  ['istinja','Istinja'],
+  ['activation','Activation'],
+  ['handwash','Handwash'],
+  ['privacy','Privacy'],
+  ['installation','Installation']
+];
 const DIMENSIONS=['Splash','Cleansing','Privacy','Usability','Cleanability','Feasibility'];
 const SELECTION_WEIGHTS={Splash:25,Cleansing:20,Privacy:15,Usability:15,Cleanability:15,Feasibility:10};
-const SLOT_INFLUENCE={basin:{Splash:1,Cleansing:.1,Privacy:.1,Usability:.5,Cleanability:.8,Feasibility:.8},frontLip:{Splash:.75,Cleansing:.1,Privacy:.2,Usability:.65,Cleanability:.65,Feasibility:.8},impact:{Splash:1,Cleansing:.1,Privacy:0,Usability:.3,Cleanability:.8,Feasibility:.65},aim:{Splash:.7,Cleansing:0,Privacy:0,Usability:.8,Cleanability:.7,Feasibility:.9},residual:{Splash:.85,Cleansing:0,Privacy:.15,Usability:.2,Cleanability:.8,Feasibility:.75},istinja:{Splash:.15,Cleansing:1,Privacy:.1,Usability:.75,Cleanability:.8,Feasibility:.7},activation:{Splash:0,Cleansing:.4,Privacy:0,Usability:1,Cleanability:.5,Feasibility:.8},flush:{Splash:.2,Cleansing:.1,Privacy:0,Usability:.45,Cleanability:1,Feasibility:.75},privacy:{Splash:.35,Cleansing:0,Privacy:1,Usability:.7,Cleanability:.55,Feasibility:.65},position:{Splash:.65,Cleansing:.2,Privacy:.25,Usability:1,Cleanability:.65,Feasibility:.8},drain:{Splash:.2,Cleansing:.25,Privacy:0,Usability:.35,Cleanability:1,Feasibility:.85},service:{Splash:0,Cleansing:.1,Privacy:0,Usability:.2,Cleanability:.8,Feasibility:1}};
+const SLOT_INFLUENCE={
+  basin:{Splash:1,Cleansing:.1,Privacy:.35,Usability:.65,Cleanability:.8,Feasibility:.8},
+  aim:{Splash:.55,Cleansing:0,Privacy:.05,Usability:.9,Cleanability:.65,Feasibility:.9},
+  residual:{Splash:1,Cleansing:0,Privacy:.35,Usability:.45,Cleanability:.8,Feasibility:.7},
+  istinja:{Splash:.1,Cleansing:1,Privacy:.1,Usability:.8,Cleanability:.75,Feasibility:.7},
+  activation:{Splash:0,Cleansing:.35,Privacy:0,Usability:1,Cleanability:.5,Feasibility:.8},
+  handwash:{Splash:0,Cleansing:1,Privacy:.05,Usability:.65,Cleanability:.6,Feasibility:.45},
+  privacy:{Splash:.2,Cleansing:0,Privacy:1,Usability:.65,Cleanability:.55,Feasibility:.6},
+  installation:{Splash:.2,Cleansing:.1,Privacy:.7,Usability:.8,Cleanability:.7,Feasibility:1}
+};
 function C(id,slot,name,desc,image,source,sourceUrl,evidence,stats){return{id,slot,name,desc,image,source,sourceUrl,evidence,stats:Object.fromEntries(DIMENSIONS.map((d,i)=>[d,stats[i]]))}}
 const BASE_COMPONENTS=[
-C('basin-commercial','basin','Optimized Conventional','Familiar commercial wall-hung envelope; useful as a compact public benchmark.','assets/commercial.jpg','PNAS Nexus 2025 · Fig. 4 render','https://doi.org/10.1093/pnasnexus/pgaf087','research',[3,1,2,5,5,5]),
-C('basin-deep','basin','Deep Basin','Deeper basin volume prioritizes splash containment and tolerance.','assets/urinals_pair.jpg','Field precedent / benchmark','', 'benchmark',[4,1,3,4,3,4]),
-C('basin-cornucopia','basin','Cornucopia-derived','Low-angle research geometry derived from isogonal-curve logic.','assets/cornucopia.jpg','PNAS Nexus 2025 · Fig. 4 render','https://doi.org/10.1093/pnasnexus/pgaf087','research',[5,1,2,3,4,2]),
-C('basin-nautilus','basin','Nautilus-derived','Low-angle research geometry with stronger tolerance to height and aiming variation.','assets/nautilus.jpg','PNAS Nexus 2025 · Fig. 4 render','https://doi.org/10.1093/pnasnexus/pgaf087','research',[5,1,2,4,4,2]),
-C('basin-halfstall','basin','Half / Floor-Stall','Larger receiving envelope for tolerance and accessibility; needs more space.','assets/full_cubicle.jpg','Field precedent','', 'benchmark',[4,1,3,4,3,3]),
-C('lip-conventional','frontLip','Conventional Lip','Compact and familiar front edge with minimal projection.','assets/commercial_detail.jpg','Baseline option','', 'hypothesis',[2,1,1,5,5,5]),
-C('lip-extended','frontLip','Extended Lip','Brings receiving edge closer to the user and helps manage residual drip.','assets/nautilus_detail.jpg','Benchmark-inspired direction','', 'benchmark',[4,1,2,4,4,4]),
-C('lip-sweeping','frontLip','Low Sweeping Lip','Low forward sweep encourages a close stance without a hard step.','assets/lafontaine.jpg','Design hypothesis','', 'hypothesis',[4,1,2,4,4,3]),
-C('lip-asym','frontLip','Asymmetric Capture','Front edge extends strategically toward the dominant approach side.','assets/cornucopia_detail.jpg','Design hypothesis','', 'hypothesis',[4,1,2,3,3,3]),
-C('impact-smooth','impact','Smooth Concave','Easy-clean smooth receiving surface relying primarily on basin geometry.','assets/commercial_heat.jpg','Research fig / derived interpretation','', 'hypothesis',[4,1,1,4,5,5]),
-C('impact-trough','impact','Guided Trough','A shallow channel guides liquid toward the drain while controlling trajectory.','assets/nautilus_heat.jpg','Research fig / derived interpretation','', 'hypothesis',[4,1,1,4,4,4]),
-C('impact-rib','impact','Integrated Rib','Built-in ribbing redirects residual flow but must avoid becoming a dirt trap.','assets/cornucopia_heat.jpg','Mechanism library synthesis','', 'benchmark',[4,1,1,3,3,3]),
-C('impact-honey','impact','Honeycomb-inspired Zone','Energy-dissipation logic inspired by commercial splash-control textures.','assets/commercial_heat.jpg','Commercial mechanism precedent → design hypothesis','', 'benchmark',[4,1,1,3,2,3]),
-C('aim-none','aim','No Cue','No explicit visual or geometric aiming guidance.','assets/commercial.jpg','Baseline','', 'hypothesis',[2,1,1,4,5,5]),
-C('aim-graphic','aim','Graphic Target','Simple visual cue such as a fly / contrast target to direct aim.','assets/urinals_pair.jpg','Behavioral benchmark','', 'benchmark',[4,1,1,5,5,5]),
-C('aim-emboss','aim','Embossed Target','Tactile / relief target integrated into the basin surface.','assets/commercial_detail.jpg','Design hypothesis','', 'hypothesis',[4,1,1,4,4,4]),
-C('aim-concavity','aim','Concavity Cue','Local concavity visually and geometrically suggests the intended receiving area.','assets/nautilus_heat.jpg','Design hypothesis','', 'hypothesis',[4,1,1,5,4,4]),
-C('aim-geometry','aim','Geometry-defined','The entire basin geometry makes the preferred aiming path visually obvious.','assets/nautilus.jpg','Research synthesis principle','', 'research',[5,1,1,5,4,3]),
-C('res-none','residual','None','No dedicated residual splash layer; geometry does the work.','assets/commercial.jpg','Baseline','', 'hypothesis',[3,1,1,5,5,5]),
-C('res-bristle','residual','Bristle / Spike','Replaceable raised texture dissipates splash energy; maintenance must be considered.','assets/commercial_heat.jpg','Commercial anti-splash screen precedent','', 'benchmark',[4,1,1,3,2,4]),
-C('res-honey','residual','Web / Honeycomb','Cellular geometry breaks up splash and residual flow.','assets/cornucopia_heat.jpg','Commercial screen precedent','', 'benchmark',[4,1,1,3,3,4]),
-C('res-sidewall','residual','Deep Sidewall','Containment by sidewall rather than an inserted catcher.','assets/divider_pair.jpg','Research synthesis','', 'benchmark',[4,1,3,4,4,4]),
-C('res-wing','residual','Splash Wing','Local side element supports both residual containment and privacy.','assets/divider_pair.jpg','Research synthesis','', 'benchmark',[4,1,4,4,3,3]),
-C('ist-fixed','istinja','Fixed Spout','Simple built-in personal-cleansing outlet.','assets/urinals_pair.jpg','Subsystem option from research package','', 'benchmark',[1,4,1,4,4,5]),
-C('ist-protected','istinja','Protected Spout','Outlet is shielded from the main contamination zone while remaining reachable.','assets/divider_pair.jpg','Research synthesis preferred direction','', 'benchmark',[1,5,1,5,4,4]),
-C('ist-recessed','istinja','Recessed Spout','Outlet sits inside a protected recess and emerges as part of the basin architecture.','assets/full_cubicle.jpg','Research synthesis preferred direction','', 'benchmark',[1,5,1,4,4,3]),
-C('ist-fold','istinja','Fold / Retract Spout','High reach flexibility and protection, with higher mechanism complexity.','assets/full_cubicle.jpg','Morphological option','', 'hypothesis',[1,5,1,4,3,2]),
-C('ist-handheld','istinja','Handheld Spray','Familiar water-based cleansing interaction but adds hose storage and cleaning concerns.','assets/urinals_pair.jpg','Existing / benchmark precedent','', 'benchmark',[1,5,2,5,2,4]),
-C('act-manual','activation','Manual Button','Simple, familiar and easy to service.','assets/commercial.jpg','Baseline','', 'benchmark',[1,3,1,4,4,5]),
-C('act-wave','activation','Wave Sensor','Touchless intentional activation using a hand wave.','assets/urinals_pair.jpg','Commercial precedent','', 'benchmark',[1,4,1,5,5,4]),
-C('act-presence','activation','Presence Sensor','Automatic detection reduces touchpoints but may reduce explicit user control.','assets/commercial.jpg','Commercial precedent','', 'benchmark',[1,3,1,5,5,3]),
-C('act-timed','activation','Timed Sequence','Controlled duration for repeatable water use.','assets/urinals_pair.jpg','Design hypothesis','', 'hypothesis',[1,4,1,4,4,4]),
-C('act-foot','activation','Foot Control','Hands-free mechanical activation; requires floor/accessibility consideration.','assets/full_cubicle.jpg','Exploratory concept','', 'hypothesis',[1,4,1,4,4,3]),
-C('flush-washout','flush','Washout / Washdown','Familiar rinse architecture and service ecosystem.','assets/commercial.jpg','Commercial taxonomy','', 'benchmark',[2,1,1,4,4,5]),
-C('flush-touchless','flush','Touchless Washout','Sensor-controlled rinse cycle.','assets/urinals_pair.jpg','Commercial taxonomy','', 'benchmark',[2,1,1,5,5,4]),
-C('flush-lowflow','flush','Low-flow Rinse','Reduced-water rinse strategy that must preserve cleanliness.','assets/commercial.jpg','Design direction','', 'hypothesis',[2,1,1,4,4,4]),
-C('flush-siphon','flush','Siphon System','Strong evacuation performance with additional plumbing / form constraints.','assets/full_cubicle.jpg','Commercial taxonomy','', 'benchmark',[2,1,1,4,5,3]),
-C('flush-waterless','flush','Waterless + Separate Cleansing','Urine handling and personal cleansing are fully separated.','assets/cubicle_corridor.jpg','Exploratory architecture','', 'hypothesis',[2,4,1,3,3,2]),
-C('priv-none','privacy','None','No local product privacy element.','assets/commercial.jpg','Baseline','', 'hypothesis',[1,1,1,5,5,5]),
-C('priv-shallow','privacy','Shallow Wing','Compact local visual shield and residual splash boundary.','assets/divider_pair.jpg','Research synthesis','', 'benchmark',[3,1,3,5,4,5]),
-C('priv-deep','privacy','Deep Integrated Wing','Higher local privacy and containment with more surface area and footprint.','assets/full_cubicle.jpg','Research synthesis','', 'benchmark',[4,1,4,4,3,3]),
-C('priv-divider','privacy','Divider Interface','Product geometry intentionally mates with a room divider / partition strategy.','assets/divider_pair.jpg','Installation-system strategy','', 'benchmark',[2,1,4,4,4,4]),
-C('priv-cubicle','privacy','Full Cubicle Mode','Maximum privacy as an installation mode rather than a basin feature.','assets/cubicle_corridor.jpg','Field precedent','', 'benchmark',[4,1,5,3,3,3]),
-C('pos-none','position','No Cue','User decides stance without explicit guidance.','assets/commercial.jpg','Baseline','', 'hypothesis',[2,1,1,4,5,5]),
-C('pos-floor','position','Floor Cue','Graphic / material floor marker suggests the preferred stance.','assets/full_cubicle.jpg','Behavioral strategy','', 'benchmark',[3,1,1,5,5,5]),
-C('pos-toe','position','Toe Recess','A shallow toe-space encourages close positioning without a raised platform.','assets/nautilus.jpg','Research synthesis','', 'hypothesis',[4,2,2,5,4,4]),
-C('pos-lip','position','Front-Lip Cue','Product edge visually communicates how close the body should approach.','assets/commercial_detail.jpg','Design hypothesis','', 'hypothesis',[4,2,2,5,5,5]),
-C('pos-proximity','position','Geometry-induced Proximity','Overall fixture shape makes the intended close stance feel natural.','assets/nautilus.jpg','Research synthesis principle','', 'research',[5,2,2,5,4,3]),
-C('pos-tray','position','Standing Tray','Defined standing / drainage zone manages drip but introduces cleaning trade-offs.','assets/full_cubicle.jpg','Standing-zone precedent','', 'benchmark',[5,2,2,3,2,3]),
-C('drain-central','drain','Central Drain','Simple, familiar drainage path.','assets/lafontaine.jpg','Baseline','', 'benchmark',[1,1,1,5,5,5]),
-C('drain-rear','drain','Rear Drain','Moves drain visually away from the user and front lip.','assets/nautilus_detail.jpg','Morphological option','', 'hypothesis',[1,1,1,4,5,4]),
-C('drain-channel','drain','Concealed Channel','Hidden channel supports a cleaner visual field but adds service complexity.','assets/cornucopia_detail.jpg','Morphological option','', 'hypothesis',[1,2,1,4,4,3]),
-C('drain-linear','drain','Linear Drain','Extended drainage line supports wide receiving surfaces and cleaning flow.','assets/urinals_pair.jpg','Morphological option','', 'hypothesis',[1,2,1,4,4,3]),
-C('service-rear','service','Rear Access','Conventional hidden service access from wall / rear.','assets/commercial.jpg','Baseline','', 'benchmark',[1,1,1,4,4,4]),
-C('service-top','service','Top Access','Service components can be reached from above.','assets/commercial_detail.jpg','Morphological option','', 'hypothesis',[1,1,1,4,4,4]),
-C('service-front','service','Removable Front','Front service panel simplifies maintenance in tight installations.','assets/nautilus_detail.jpg','Morphological option','', 'hypothesis',[1,1,1,4,4,5]),
-C('service-side','service','Side / Rear Panel','Flexible access strategy depending on the installation mode.','assets/cornucopia_detail.jpg','Morphological option','', 'hypothesis',[1,1,1,4,4,4]),
+  C('basin-optimized','basin','Optimized Conventional','Compact wall-hung baseline refined for the intended use context.','assets/commercial.jpg','Baseline / commercial precedent','', 'benchmark',[3,1,2,5,5,5]),
+  C('basin-deep30','basin','Deep Half-Stall ≤30° Profile','Deeper receiving geometry combining containment with a low-angle impact profile.','assets/urinals_pair.jpg','Research synthesis · low-angle geometry','https://doi.org/10.1093/pnasnexus/pgaf087','research',[5,1,3,4,4,3]),
+  C('basin-floorstall','basin','Floor / Stall','Larger receiving and standing envelope for broader tolerance, with higher footprint.','assets/full_cubicle.jpg','Field / installation precedent','', 'benchmark',[4,1,4,3,3,2]),
+
+  C('aim-none','aim','No Cue','No explicit aiming or standing cue; the user determines the target naturally.','assets/commercial.jpg','Baseline','', 'hypothesis',[2,1,1,4,5,5]),
+  C('aim-graphic','aim','Graphic Cue','A simple visual target communicates the preferred receiving area.','assets/urinals_pair.jpg','Behavioral benchmark','', 'benchmark',[4,1,1,5,5,5]),
+  C('aim-integrated','aim','Integrated Target','A target is formed directly into the basin surface rather than added as a graphic.','assets/commercial_detail.jpg','Design hypothesis','', 'hypothesis',[5,1,1,5,4,4]),
+  C('aim-standing','aim','Standing Cue','A combined visual / geometric cue communicates where and how closely to stand.','assets/nautilus.jpg','Research synthesis direction','', 'hypothesis',[4,1,2,5,4,4]),
+
+  C('res-none','residual','None','No separate splash-control insert; the basin geometry carries the main function.','assets/commercial.jpg','Baseline','', 'hypothesis',[3,1,1,5,5,5]),
+  C('res-bristle','residual','Bristle','Raised flexible texture dissipates splash energy; maintenance remains a trade-off.','assets/commercial_heat.jpg','Commercial anti-splash precedent','', 'benchmark',[4,1,1,3,2,4]),
+  C('res-honeycomb','residual','Honeycomb','Cellular texture breaks up residual flow and splash energy.','assets/cornucopia_heat.jpg','Commercial screen precedent','', 'benchmark',[4,1,1,3,3,4]),
+  C('res-wing','residual','Privacy / Splash Wing','A local wing provides a secondary splash boundary while also contributing to privacy.','assets/divider_pair.jpg','Research synthesis direction','', 'hypothesis',[4,1,4,4,3,3]),
+
+  C('ist-fixed','istinja','Fixed Spout','Built-in fresh-water outlet integrated directly into the appliance.','assets/urinals_pair.jpg','Subsystem option from research synthesis','', 'benchmark',[1,5,1,4,4,5]),
+  C('ist-handheld','istinja','Handheld Spray','Flexible water-based cleansing interaction with hose and holder requirements.','assets/full_cubicle.jpg','Existing / benchmark precedent','', 'benchmark',[1,5,2,5,2,4]),
+  C('ist-retrofit','istinja','Retrofit Spout','Fresh-water cleansing outlet added through a replaceable / retrofit interface.','assets/commercial_detail.jpg','Retrofit direction','', 'hypothesis',[1,5,1,4,4,4]),
+  C('ist-hybrid','istinja','Hybrid','Combines a built-in outlet with a flexible secondary cleansing interface.','assets/urinals_pair.jpg','Exploratory concept','', 'hypothesis',[1,5,2,4,3,3]),
+
+  C('act-manual','activation','Manual','Direct user-controlled activation with a simple, serviceable mechanism.','assets/commercial.jpg','Baseline','', 'benchmark',[1,3,1,4,4,5]),
+  C('act-wave','activation','Wave Sensor','Touchless activation through a deliberate hand gesture.','assets/urinals_pair.jpg','Commercial precedent','', 'benchmark',[1,4,1,5,5,4]),
+  C('act-presence','activation','Presence Sensor','Automatic activation based on user presence; less explicit user control.','assets/commercial.jpg','Commercial precedent','', 'benchmark',[1,3,1,5,5,3]),
+  C('act-foot','activation','Foot Control Concept','Hands-free mechanical activation using a foot-operated control concept.','assets/full_cubicle.jpg','Exploratory concept','', 'hypothesis',[1,4,1,4,4,3]),
+
+  C('hand-separate','handwash','Separate','Handwashing remains a separate fixture, minimizing changes to the urinal appliance.','assets/cubicle_corridor.jpg','Installation / restroom precedent','', 'benchmark',[1,5,2,4,4,4]),
+  C('hand-integrated','handwash','Integrated','Hand-rinse function is integrated into the same product system.','assets/full_cubicle.jpg','Design direction','', 'hypothesis',[1,5,3,5,3,3]),
+  C('hand-greywater','handwash','Greywater Reuse','Handwashing water is routed for reuse in the urinal system where the installation permits it.','assets/cubicle_corridor.jpg','Sustainability direction','', 'hypothesis',[1,3,2,3,3,2]),
+  C('hand-na','handwash','N/A','No handwash integration is included in the product concept.','assets/commercial.jpg','Scope baseline','', 'hypothesis',[1,2,1,5,5,5]),
+
+  C('priv-small','privacy','Small Divider','Compact local divider that reduces direct sightline without enclosing the user.','assets/divider_pair.jpg','Research synthesis / privacy interface','', 'benchmark',[2,1,3,5,4,5]),
+  C('priv-extended','privacy','Extended Partition','Larger partition provides stronger visual shielding with more footprint.','assets/divider_pair.jpg','Installation precedent','', 'benchmark',[3,1,4,4,3,3]),
+  C('priv-wing','privacy','Product Wing','Privacy is produced directly by the appliance form rather than a separate room partition.','assets/full_cubicle.jpg','Research synthesis direction','', 'hypothesis',[4,1,4,4,3,3]),
+  C('priv-cubicle','privacy','Full Cubicle','Maximum visual privacy through an enclosure-level installation condition.','assets/cubicle_corridor.jpg','Field / restroom precedent','', 'benchmark',[4,1,5,3,3,3]),
+
+  C('inst-adult','installation','Adult Wall-Hung','Standard adult-height wall-hung installation for conventional public use.','assets/commercial.jpg','Installation precedent','', 'benchmark',[2,1,2,5,5,5]),
+  C('inst-lower','installation','Lower Unit','Lower mounting condition supports users who need a lower standing height.','assets/full_cubicle.jpg','Accessibility strategy','', 'benchmark',[3,1,3,4,4,4]),
+  C('inst-standing','installation','Standing Tray','Defined standing / drainage zone supports positioning and residual management.','assets/full_cubicle.jpg','Standing-zone precedent','', 'hypothesis',[4,2,3,3,2,3]),
+  C('inst-modular','installation','Modular Mount','Mounting interface supports different installation configurations without redesigning the core basin.','assets/divider_pair.jpg','Installation-system strategy','', 'hypothesis',[3,1,4,4,4,3])
 ];
-const PRESETS={'Geometry First':{basin:'basin-nautilus',frontLip:'lip-extended',impact:'impact-smooth',aim:'aim-geometry',residual:'res-sidewall',istinja:'ist-protected',activation:'act-wave',flush:'flush-touchless',privacy:'priv-shallow',position:'pos-proximity',drain:'drain-rear',service:'service-front'},'Containment First':{basin:'basin-deep',frontLip:'lip-extended',impact:'impact-rib',aim:'aim-concavity',residual:'res-honey',istinja:'ist-protected',activation:'act-wave',flush:'flush-touchless',privacy:'priv-deep',position:'pos-lip',drain:'drain-linear',service:'service-side'},'Compact Public':{basin:'basin-commercial',frontLip:'lip-sweeping',impact:'impact-smooth',aim:'aim-graphic',residual:'res-sidewall',istinja:'ist-recessed',activation:'act-wave',flush:'flush-lowflow',privacy:'priv-shallow',position:'pos-toe',drain:'drain-rear',service:'service-front'}};
-const defaultState={version:'0.5',current:{id:'current',name:'Untitled Build',hypothesis:'',status:'LOADOUT',loadout:{},sketch:null,createdAt:Date.now(),updatedAt:Date.now()},saved:[],imageOverrides:{},componentOverrides:{},activeSlot:'basin',view:'library',inspectId:null,libraryMode:'large',slotMode:'compact'};
+const PRESETS={
+  'Geometry First':{basin:'basin-deep30',aim:'aim-integrated',residual:'res-none',istinja:'ist-fixed',activation:'act-wave',handwash:'hand-separate',privacy:'priv-wing',installation:'inst-adult'},
+  'Containment First':{basin:'basin-deep30',aim:'aim-standing',residual:'res-honeycomb',istinja:'ist-fixed',activation:'act-wave',handwash:'hand-separate',privacy:'priv-extended',installation:'inst-lower'},
+  'Compact Public':{basin:'basin-optimized',aim:'aim-graphic',residual:'res-wing',istinja:'ist-retrofit',activation:'act-wave',handwash:'hand-na',privacy:'priv-small',installation:'inst-adult'}
+};
+const defaultState={version:'0.6',current:{id:'current',name:'Untitled Build',hypothesis:'',status:'LOADOUT',loadout:{},sketch:null,createdAt:Date.now(),updatedAt:Date.now()},saved:[],imageOverrides:{},componentOverrides:{},activeSlot:'basin',view:'library',inspectId:null,libraryMode:'large',slotMode:'compact'};
 let state=structuredClone(defaultState);
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -399,39 +403,26 @@ function renderSlots(){
     </button>`;
   }).join('');
   $$('.slotmodebtn').forEach(b=>b.classList.toggle('active',b.dataset.slotMode===mode));
-
   if(mode==='compact'){
     requestAnimationFrame(()=>{
       const cs=getComputedStyle(root);
-      const panelH=root.clientHeight;
-      const panelW=root.clientWidth;
-      const gap=parseFloat(cs.rowGap)||6;
-      const colGap=parseFloat(cs.columnGap)||6;
-      const padTop=parseFloat(cs.paddingTop)||0;
-      const padBottom=parseFloat(cs.paddingBottom)||0;
-      const padLeft=parseFloat(cs.paddingLeft)||0;
-      const padRight=parseFloat(cs.paddingRight)||0;
-
+      const panelH=root.clientHeight, panelW=root.clientWidth;
+      const gap=parseFloat(cs.rowGap)||6, colGap=parseFloat(cs.columnGap)||6;
+      const padTop=parseFloat(cs.paddingTop)||0, padBottom=parseFloat(cs.paddingBottom)||0;
+      const padLeft=parseFloat(cs.paddingLeft)||0, padRight=parseFloat(cs.paddingRight)||0;
+      const rows=Math.ceil(SLOTS.length/2), headerH=17;
       const maxCardW=(panelW-padLeft-padRight-colGap)/2;
-      const rowH=(panelH-padTop-padBottom-gap*5)/6;
-      const headerH=17;
-      const square=Math.max(24, Math.floor(Math.min(maxCardW, rowH-headerH)));
-
+      const rowH=(panelH-padTop-padBottom-gap*(rows-1))/rows;
+      const square=Math.max(20,Math.floor(Math.min(maxCardW,rowH-headerH)));
       root.querySelectorAll('.slot').forEach(slot=>{
-        slot.style.width=square+'px';
-        slot.style.height=(headerH+square)+'px';
-        slot.style.justifySelf='center';
-        slot.style.alignSelf='center';
-        const media=slot.querySelector('.media');
-        if(media){
-          media.style.width=square+'px';
-          media.style.height=square+'px';
-        }
+        slot.style.width=square+'px'; slot.style.height=(headerH+square)+'px';
+        slot.style.justifySelf='center'; slot.style.alignSelf='center';
+        const media=slot.querySelector('.media'); if(media){media.style.width=square+'px';media.style.height=square+'px'}
       });
     });
   }
 }
-function renderLeft(){ $('#currentBuildTitle').textContent=current().name||'Untitled Build'; $('#currentHyp').textContent=current().hypothesis||'Preset loadout — edit this hypothesis before using it as a design claim.'; $('#currentStatus').textContent=current().status||'LOADOUT'; $('#scoreQuick').textContent=selectionScore(); $('#equippedQuick').textContent=`${Object.keys(current().loadout||{}).length}/12`; $('#researchQuick').textContent=`${researchBackedCount()}/${Object.keys(current().loadout||{}).length||0}`;
+function renderLeft(){ $('#currentBuildTitle').textContent=current().name||'Untitled Build'; $('#currentHyp').textContent=current().hypothesis||'Preset loadout — edit this hypothesis before using it as a design claim.'; $('#currentStatus').textContent=current().status||'LOADOUT'; $('#scoreQuick').textContent=selectionScore(); $('#equippedQuick').textContent=`${Object.keys(current().loadout||{}).length}/${SLOTS.length}`; $('#researchQuick').textContent=`${researchBackedCount()}/${SLOTS.length}`;
   const sketch=current().sketch; const basin=loadoutComp('basin'); const root=$('#previewInner'); $('#removeSketchBtn').style.display=sketch?'inline-flex':'none';
   if(sketch){ root.innerHTML=`<img class="preview-placeholder" src="${esc(sketch)}" alt="Sketch"><div class="preview-overlay"><b>${esc(current().name||'Current Build')}</b>${esc(current().hypothesis||'Uploaded sketch attached to this build.')}</div>`; }
   else if(basin && imageSrc(basin)){ root.innerHTML=`<img class="preview-placeholder" src="${esc(imageSrc(basin))}" alt="Selected basin preview"><div class="preview-overlay"><b>${esc(basin.name)}</b>Selected basin preview. Upload your own sketch later to replace this temporary visual.</div>`; }
@@ -459,19 +450,50 @@ const DBNAME='MorphologicalLoadoutDB_v02', STORE='app', KEY='state';
 function db(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DBNAME,1); req.onupgradeneeded=()=>req.result.createObjectStore(STORE); req.onsuccess=()=>resolve(req.result); req.onerror=()=>reject(req.error)})}
 async function persist(touch=true){if(touch) state._localUpdatedAt=Date.now(); try{const d=await db(); await new Promise((res,rej)=>{const tx=d.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(state,KEY); tx.oncomplete=res; tx.onerror=()=>rej(tx.error)}); d.close()}catch(e){localStorage.setItem('morphlab-fallback-v02', JSON.stringify(state))}}
 async function loadPublishedSnapshot(){window.MORPH_PUBLISHED_STATE=null; return new Promise(resolve=>{const old=document.getElementById('publishedStateScript'); if(old) old.remove(); const sc=document.createElement('script'); sc.id='publishedStateScript'; sc.src='published-state.js?v='+Date.now(); sc.onload=()=>resolve(window.MORPH_PUBLISHED_STATE||null); sc.onerror=()=>resolve(null); document.head.appendChild(sc)})}
-async function restore(){let local=null; try{const d=await db(); local=await new Promise((res,rej)=>{const tx=d.transaction(STORE,'readonly'); const r=tx.objectStore(STORE).get(KEY); r.onsuccess=()=>res(r.result||null); r.onerror=()=>rej(r.error)}); d.close()}catch(e){try{const x=localStorage.getItem('morphlab-fallback-v02'); if(x)local=JSON.parse(x)}catch(_){}} const pub=window.MORPH_PUBLISHED_STATE; if(pub){const pubAt=pub._publishedAt||0, localAt=local?Math.max(local._localUpdatedAt||0,local._publishedAt||0):0; state=(!local||pubAt>localAt)?structuredClone(pub):local}else if(local){state=local} if(!state.libraryMode) state.libraryMode='large'}
-async function forcePublished(){const pub=await loadPublishedSnapshot(); if(!pub){toast('No published snapshot found');return} state=structuredClone(pub); state._localUpdatedAt=state._publishedAt||Date.now(); await persist(false); renderAll(); toast('Published version loaded')}
+function migrateToV06(s){
+  if(!s || typeof s!=='object') return s;
+  const map={
+    'basin-commercial':'basin-optimized','basin-deep':'basin-deep30','basin-halfstall':'basin-floorstall','basin-nautilus':'basin-deep30','basin-cornucopia':'basin-deep30',
+    'aim-none':'aim-none','aim-graphic':'aim-graphic','aim-emboss':'aim-integrated','aim-concavity':'aim-integrated','aim-geometry':'aim-standing',
+    'res-none':'res-none','res-bristle':'res-bristle','res-honey':'res-honey','res-sidewall':'res-wing','res-wing':'res-wing',
+    'ist-fixed':'ist-fixed','ist-handheld':'ist-handheld','ist-protected':'ist-retrofit','ist-recessed':'ist-retrofit','ist-fold':'ist-hybrid',
+    'act-manual':'act-manual','act-wave':'act-wave','act-presence':'act-presence','act-timed':'act-presence','act-foot':'act-foot',
+    'priv-none':'priv-small','priv-shallow':'priv-small','priv-deep':'priv-extended','priv-divider':'priv-extended','priv-cubicle':'priv-cubicle',
+    'pos-none':'aim-none','pos-floor':'aim-standing','pos-toe':'aim-standing','pos-lip':'aim-standing','pos-proximity':'aim-standing','pos-tray':'inst-standing',
+    'service-rear':'inst-adult','service-top':'inst-modular','service-front':'inst-modular','service-side':'inst-modular'
+  };
+  const oldToNew={basin:'basin',frontLip:null,impact:null,aim:'aim',residual:'residual',istinja:'istinja',activation:'activation',flush:null,privacy:'privacy',position:'installation',drain:null,service:'installation'};
+  const convertLoadout=(lo={})=>{
+    const out={};
+    for(const [slot,id] of Object.entries(lo)){
+      if(SLOTS.some(x=>x[0]===slot) && BASE_COMPONENTS.some(c=>c.id===id && c.slot===slot)) out[slot]=id;
+      else if(map[id]){
+        const nid=map[id], nc=BASE_COMPONENTS.find(c=>c.id===nid); if(nc && !out[nc.slot]) out[nc.slot]=nid;
+      }
+    }
+    return out;
+  };
+  const cleanBuild=b=>{if(!b)return b; b.loadout=convertLoadout(b.loadout||{}); return b};
+  s.current=cleanBuild(s.current||defaultState.current);
+  s.saved=(s.saved||[]).map(cleanBuild);
+  s.imageOverrides=Object.fromEntries(Object.entries(s.imageOverrides||{}).filter(([id])=>BASE_COMPONENTS.some(c=>c.id===id)));
+  s.componentOverrides=Object.fromEntries(Object.entries(s.componentOverrides||{}).filter(([id])=>BASE_COMPONENTS.some(c=>c.id===id)));
+  s.version='0.6';
+  return s;
+}
+async function restore(){let local=null; try{const d=await db(); local=await new Promise((res,rej)=>{const tx=d.transaction(STORE,'readonly'); const r=tx.objectStore(STORE).get(KEY); r.onsuccess=()=>res(r.result||null); r.onerror=()=>rej(r.error)}); d.close()}catch(e){try{const x=localStorage.getItem('morphlab-fallback-v02'); if(x)local=JSON.parse(x)}catch(_){}} const pub=window.MORPH_PUBLISHED_STATE; if(pub){const pubAt=pub._publishedAt||0, localAt=local?Math.max(local._localUpdatedAt||0,local._publishedAt||0):0; state=(!local||pubAt>localAt)?structuredClone(pub):local}else if(local){state=local} state=migrateToV06(state); if(!state.libraryMode) state.libraryMode='large'}
+async function forcePublished(){const pub=await loadPublishedSnapshot(); if(!pub){toast('No published snapshot found');return} state=migrateToV06(structuredClone(pub)); state._localUpdatedAt=state._publishedAt||Date.now(); await persist(false); renderAll(); toast('Published version loaded')}
 document.addEventListener('click', async e=>{const t=e.target.closest('button,[data-slot],[data-component],[data-equip],[data-preset],[data-build],[data-back-library],[data-replace-photo],[data-close-inspect],[data-library-mode],[data-slot-mode],[data-load-published]'); if(!t) return; if(t.dataset.slotMode){state.slotMode=t.dataset.slotMode; await persist(); renderSlots(); return} if(t.dataset.libraryMode){state.libraryMode=t.dataset.libraryMode; await persist(); state.inspectId=null; renderWorkspace(); setTabs(); return} if(t.hasAttribute('data-load-published')){$('#buildMenu').classList.remove('open'); await forcePublished(); return} if(t.id==='buildDropdownBtn'){const m=$('#buildMenu'); const open=!m.classList.contains('open'); m.classList.toggle('open',open); t.setAttribute('aria-expanded',open?'true':'false'); return} if(t.dataset.view){state.view=t.dataset.view; state.inspectId=null; renderAll(); return} if(t.dataset.slot){state.activeSlot=t.dataset.slot; state.view='library'; state.inspectId=null; renderSlots(); renderLeft(); if(!$('.tab[data-view=library]').classList.contains('active')){renderWorkspace();setTabs()} requestAnimationFrame(()=>document.getElementById('section-'+t.dataset.slot)?.scrollIntoView({block:'start'})); return} if(t.dataset.component){state.inspectId=t.dataset.component; state.activeSlot=compById(t.dataset.component).slot; renderSlots(); renderLeft(); return} if(t.dataset.equip){const c=compById(t.dataset.equip); current().loadout[c.slot]=c.id; state.activeSlot=c.slot; current().updatedAt=Date.now(); await persist(); renderSlots(); renderLeft(); refreshEquippedCards(); renderBuildStrip(); toast(c.name+' equipped'); return} if(t.dataset.backLibrary!==undefined){state.inspectId=null; renderLeft(); return} if(t.dataset.preset){$('#buildMenu').classList.remove('open'); current().loadout={...PRESETS[t.dataset.preset]}; current().name=t.dataset.preset; current().hypothesis='Preset loadout — edit this hypothesis before using it as a design claim.'; current().updatedAt=Date.now(); await persist(); renderAll(); toast('Preset loaded'); return} if(t.dataset.build){$('#buildMenu').classList.remove('open'); const b=state.saved.find(x=>x.id===t.dataset.build); if(b){state.current=structuredClone(b); await persist(); renderAll()} return} if(t.dataset.replacePhoto){$('#replace-'+t.dataset.replacePhoto)?.click(); return} if(t.hasAttribute('data-close-inspect')){state.inspectId=null; renderLeft(); return} if(t.hasAttribute('data-close-modal')){closeModal(); return}});
 document.addEventListener('change', async e=>{ if(e.target.id?.startsWith('replace-')){const id=e.target.id.replace('replace-',''), file=e.target.files?.[0]; if(!file) return; state.imageOverrides[id]=await fileToDataURL(file,1400,.84); await persist(); renderAll(); toast('Photo replaced'); }});
-$('#newBuildBtn').onclick=async()=>{state.current={id:'current',name:'Untitled Build',hypothesis:'',status:'LOADOUT',loadout:{},sketch:null,createdAt:Date.now(),updatedAt:Date.now()}; state.inspectId=null; await persist(); renderAll(); toast('New build ready')};
+$('#newBuildBtn').onclick=async()=>{state.current={id:'current',name:'Untitled Build',hypothesis:'',status:'LOADOUT',loadout:{},sketch:null,createdAt:Date.now(),updatedAt:Date.now()}; state.version='0.6'; state.inspectId=null; await persist(); renderAll(); toast('New build ready')};
 $('#duplicateBtn').onclick=async()=>{const old=current(); state.current={...structuredClone(old),id:'current',name:(old.name||'Build')+' Copy',createdAt:Date.now(),updatedAt:Date.now()}; await persist(); renderAll(); toast('Build duplicated')};
 $('#editBuildBtn').onclick=openBuildModal;
 $('#saveBuildBtn').onclick=async()=>{const b=structuredClone(current()); if(!b.name || b.name==='Untitled Build'){openBuildModal(); toast('Name the build first'); return} const existing=state.saved.findIndex(x=>x.id===b.id && b.id!=='current'); if(b.id==='current') b.id=uid(); if(existing>=0) state.saved[existing]=b; else {const byName=state.saved.findIndex(x=>x.name===b.name); if(byName>=0){b.id=state.saved[byName].id; state.saved[byName]=b}else state.saved.push(b)} state.current=structuredClone(b); await persist(); renderAll(); toast('Build saved')};
 $('#uploadSketchBtn').onclick=()=>$('#sketchFile').click(); $('#sketchFile').onchange=async e=>{const f=e.target.files?.[0]; if(!f) return; current().sketch=await fileToDataURL(f,2200,.88); if(current().status==='LOADOUT') current().status='SKETCHED'; await persist(); renderAll(); toast('Sketch attached')};
 $('#removeSketchBtn').onclick=async()=>{current().sketch=null; await persist(); renderAll(); toast('Sketch removed')};
 $('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='Morphological_Loadout_Project_v05.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('Project exported')};
-$('#publishStateBtn').onclick=()=>{const snapshot=structuredClone(state); snapshot._publishedAt=Date.now(); snapshot._localUpdatedAt=snapshot._publishedAt; snapshot.version='0.5'; const payload='// Auto-generated by Morphological Loadout V0.5\nwindow.MORPH_PUBLISHED_STATE = '+JSON.stringify(snapshot,null,2)+';\n'; const blob=new Blob([payload],{type:'text/javascript'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='published-state.js'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('Publish snapshot downloaded')};
-$('#importBtn').onclick=()=>$('#importFile').click(); $('#importFile').onchange=async e=>{const f=e.target.files?.[0]; if(!f) return; try{state=JSON.parse(await f.text()); await persist(); renderAll(); toast('Project imported')}catch(err){alert('Import failed: '+err.message)}};
+$('#publishStateBtn').onclick=()=>{const snapshot=structuredClone(state); snapshot._publishedAt=Date.now(); snapshot._localUpdatedAt=snapshot._publishedAt; snapshot.version='0.6'; const payload='// Auto-generated by Morphological Loadout V0.6\nwindow.MORPH_PUBLISHED_STATE = '+JSON.stringify(snapshot,null,2)+';\n'; const blob=new Blob([payload],{type:'text/javascript'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='published-state.js'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('Publish snapshot downloaded')};
+$('#importBtn').onclick=()=>$('#importFile').click(); $('#importFile').onchange=async e=>{const f=e.target.files?.[0]; if(!f) return; try{state=migrateToV06(JSON.parse(await f.text())); await persist(); renderAll(); toast('Project imported')}catch(err){alert('Import failed: '+err.message)}};
 $('#modalRoot').addEventListener('click', e=>{if(e.target.id==='modalRoot') closeModal()}); document.addEventListener('click',e=>{if(!e.target.closest('#buildSelectorWrap')){$('#buildMenu')?.classList.remove('open')} if(state.inspectId && !e.target.closest('#inspectOverlay') && !e.target.closest('[data-component]')){state.inspectId=null; renderLeft()}});
-(async function(){await loadPublishedSnapshot(); await restore(); if(state.view==='selection') state.view='build'; if(!state.libraryMode) state.libraryMode='large'; state.version='0.5'; renderAll()})();
+(async function(){await loadPublishedSnapshot(); await restore(); if(state.view==='selection') state.view='build'; if(!state.libraryMode) state.libraryMode='large'; state.version='0.6'; renderAll()})();
 </script></body></html>
