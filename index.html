@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Morphological Loadout V0.6.2</title>
+<title>Morphological Loadout V0.6.3</title>
 <style>
 :root{
  --bg:#ecf1f4; --panel:#ffffff; --line:#dbe3e8; --ink:#0f2137; --muted:#6f7f8d; --cyan:#16afd0; --cyan-soft:#e6f8fc; --navy:#11233d; --shadow:0 12px 28px rgba(13,31,53,.08); --radius:16px;
@@ -13,7 +13,7 @@ button,input,textarea,select{font:inherit} button{cursor:pointer}
 .topbar{flex:0 0 auto;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:10px 12px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
 .brand{display:flex;align-items:center;gap:10px}.logo{width:28px;height:28px;border-radius:9px;background:var(--navy);color:#fff;font-weight:900;display:grid;place-items:center;font-size:11px}.brand h1{font-size:16px;line-height:1;margin:0}.brand p{margin:3px 0 0;font-size:9px;color:var(--muted);letter-spacing:.11em;text-transform:uppercase}
 .build-selector-wrap{position:relative;min-width:0;max-width:560px}.build-select{width:100%;min-width:260px;border:1px solid var(--line);background:#f8fbfc;border-radius:13px;padding:7px 11px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;color:var(--ink)}.build-select span{min-width:0}.build-select small{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}.build-select b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}.build-select i{font-style:normal;font-size:13px;color:var(--muted)}.build-menu{position:absolute;top:calc(100% + 7px);left:0;right:0;max-height:330px;overflow:auto;background:rgba(255,255,255,.98);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 44px rgba(14,32,52,.18);padding:7px;z-index:45;display:none}.build-menu.open{display:block}.menu-head{padding:7px 8px 5px;font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800}.menu-item{width:100%;border:0;background:transparent;border-radius:9px;padding:9px 10px;text-align:left;font-size:10px;color:var(--ink);display:flex;justify-content:space-between;gap:8px}.menu-item:hover,.menu-item.active{background:var(--cyan-soft);color:#0c7087}.menu-item span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.menu-item em{font-style:normal;color:var(--muted);font-size:8px}
-.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn{min-height:34px;border-radius:10px;border:1px solid var(--line);background:#fff;padding:0 11px;font-size:10px;font-weight:800;color:var(--ink)} .btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}.btn.cyan{background:var(--cyan);border-color:var(--cyan);color:#fff}.btn.ghost{background:#f8fbfc}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn{min-height:34px;border-radius:10px;border:1px solid var(--line);background:#fff;padding:0 11px;font-size:10px;font-weight:800;color:var(--ink)} .btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}.btn.cyan{background:var(--cyan);border-color:var(--cyan);color:#fff}.btn.ghost{background:#f8fbfc}.btn.danger{border-color:#e3c8c8;color:#a33;background:#fff7f7}
 .main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(340px,.98fr) 194px minmax(500px,1.30fr);gap:10px}
 .panel{min-height:0;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
 .left{display:grid;grid-template-rows:minmax(0,1fr) 112px;gap:10px;background:transparent;border:0;box-shadow:none;overflow:visible}.preview,.buildinfo{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
@@ -251,12 +251,12 @@ button,input,textarea,select{font:inherit} button{cursor:pointer}
 </head><body>
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">ML</div><div><h1>Morphological Loadout</h1><p>Integrated Urinal Concept Builder · V0.6.1</p></div></div>
+    <div class="brand"><div class="logo">ML</div><div><h1>Morphological Loadout</h1><p>Integrated Urinal Concept Builder · V0.6.3</p></div></div>
     <div class="build-selector-wrap" id="buildSelectorWrap">
       <button class="build-select" id="buildDropdownBtn" aria-expanded="false"><span><small>Current build</small><b id="selectedBuildLabel">Untitled Build</b></span><i>▾</i></button>
       <div class="build-menu" id="buildMenu"></div>
     </div>
-    <div class="actions"><button class="btn ghost" id="newBuildBtn">+ New</button><button class="btn" id="duplicateBtn">Duplicate</button><button class="btn primary" id="saveBuildBtn">Save Build</button><button class="btn" id="exportBtn">Export</button><button class="btn" id="publishStateBtn" title="Download a published-state.js snapshot for GitHub Pages">Publish State</button><button class="btn" id="importBtn">Import</button><input type="file" id="importFile" accept=".json" hidden></div>
+    <div class="actions"><button class="btn ghost" id="newBuildBtn">+ New</button><button class="btn" id="duplicateBtn">Duplicate</button><button class="btn primary" id="saveBuildBtn">Save Build</button><button class="btn danger" id="deleteBuildBtn" title="Hapus build yang sedang dipilih">Delete Build</button><button class="btn" id="exportBtn">Export</button><button class="btn" id="publishStateBtn" title="Download a published-state.js snapshot for GitHub Pages">Publish State</button><button class="btn" id="importBtn">Import</button><input type="file" id="importFile" accept=".json" hidden></div>
   </header>
   <main class="main">
     <section class="left">
@@ -472,25 +472,58 @@ function migrateToV06(s){
   };
   const cleanBuild=b=>{if(!b)return b; b.loadout=convertLoadout(b.loadout||{}); return b};
   s.current=cleanBuild(s.current||defaultState.current);
-  s.saved=(s.saved||[]).map(cleanBuild);
+  const seenIds=new Set();
+  s.saved=(s.saved||[]).map(b=>{
+    b=cleanBuild(b);
+    let id=(b.id && b.id!=='current' && !seenIds.has(b.id))?b.id:uid();
+    b.id=id; seenIds.add(id);
+    return b;
+  });
   s.imageOverrides=Object.fromEntries(Object.entries(s.imageOverrides||{}).filter(([id])=>BASE_COMPONENTS.some(c=>c.id===id)));
   s.componentOverrides=Object.fromEntries(Object.entries(s.componentOverrides||{}).filter(([id])=>BASE_COMPONENTS.some(c=>c.id===id)));
-  s.version='0.6.2';
+  s.version='0.6.3';
   return s;
 }
 async function restore(){let local=null; try{const d=await db(); local=await new Promise((res,rej)=>{const tx=d.transaction(STORE,'readonly'); const r=tx.objectStore(STORE).get(KEY); r.onsuccess=()=>res(r.result||null); r.onerror=()=>rej(r.error)}); d.close()}catch(e){try{const x=localStorage.getItem('morphlab-fallback-v02'); if(x)local=JSON.parse(x)}catch(_){}} const pub=window.MORPH_PUBLISHED_STATE; if(pub){const pubAt=pub._publishedAt||0, localAt=local?Math.max(local._localUpdatedAt||0,local._publishedAt||0):0; state=(!local||pubAt>localAt)?structuredClone(pub):local}else if(local){state=local} state=migrateToV06(state); if(!state.libraryMode) state.libraryMode='large'}
 async function forcePublished(){const pub=await loadPublishedSnapshot(); if(!pub){toast('No published snapshot found');return} state=migrateToV06(structuredClone(pub)); state._localUpdatedAt=state._publishedAt||Date.now(); await persist(false); renderAll(); toast('Published version loaded')}
-document.addEventListener('click', async e=>{const t=e.target.closest('button,[data-slot],[data-component],[data-equip],[data-preset],[data-build],[data-back-library],[data-replace-photo],[data-close-inspect],[data-library-mode],[data-slot-mode],[data-load-published]'); if(!t) return; if(t.dataset.slotMode){state.slotMode=t.dataset.slotMode; await persist(); renderSlots(); return} if(t.dataset.libraryMode){state.libraryMode=t.dataset.libraryMode; await persist(); state.inspectId=null; renderWorkspace(); setTabs(); return} if(t.hasAttribute('data-load-published')){$('#buildMenu').classList.remove('open'); await forcePublished(); return} if(t.id==='buildDropdownBtn'){const m=$('#buildMenu'); const open=!m.classList.contains('open'); m.classList.toggle('open',open); t.setAttribute('aria-expanded',open?'true':'false'); return} if(t.dataset.view){state.view=t.dataset.view; state.inspectId=null; renderAll(); return} if(t.dataset.slot){state.activeSlot=t.dataset.slot; state.view='library'; state.inspectId=null; renderSlots(); renderLeft(); if(!$('.tab[data-view=library]').classList.contains('active')){renderWorkspace();setTabs()} requestAnimationFrame(()=>document.getElementById('section-'+t.dataset.slot)?.scrollIntoView({block:'start'})); return} if(t.dataset.component){state.inspectId=t.dataset.component; state.activeSlot=compById(t.dataset.component).slot; renderSlots(); renderLeft(); return} if(t.dataset.equip){const c=compById(t.dataset.equip); current().loadout[c.slot]=c.id; state.activeSlot=c.slot; current().updatedAt=Date.now(); await persist(); renderSlots(); renderLeft(); refreshPasangpedCards(); renderBuildStrip(); toast(c.name+' equipped'); return} if(t.dataset.backLibrary!==undefined){state.inspectId=null; renderLeft(); return} if(t.dataset.preset){$('#buildMenu').classList.remove('open'); current().loadout={...PRESETS[t.dataset.preset]}; current().name=t.dataset.preset; current().hypothesis='Preset loadout — sesuaikan hipotesis ini sebelum digunakan sebagai klaim desain.'; current().updatedAt=Date.now(); await persist(); renderAll(); toast('Preset loaded'); return} if(t.dataset.build){$('#buildMenu').classList.remove('open'); const b=state.saved.find(x=>x.id===t.dataset.build); if(b){state.current=structuredClone(b); await persist(); renderAll()} return} if(t.dataset.replacePhoto){$('#replace-'+t.dataset.replacePhoto)?.click(); return} if(t.hasAttribute('data-close-inspect')){state.inspectId=null; renderLeft(); return} if(t.hasAttribute('data-close-modal')){closeModal(); return}});
+document.addEventListener('click', async e=>{const t=e.target.closest('button,[data-slot],[data-component],[data-equip],[data-preset],[data-build],[data-back-library],[data-replace-photo],[data-close-inspect],[data-library-mode],[data-slot-mode],[data-load-published]'); if(!t) return; if(t.dataset.slotMode){state.slotMode=t.dataset.slotMode; await persist(); renderSlots(); return} if(t.dataset.libraryMode){state.libraryMode=t.dataset.libraryMode; await persist(); state.inspectId=null; renderWorkspace(); setTabs(); return} if(t.hasAttribute('data-load-published')){$('#buildMenu').classList.remove('open'); await forcePublished(); return} if(t.id==='buildDropdownBtn'){const m=$('#buildMenu'); const open=!m.classList.contains('open'); m.classList.toggle('open',open); t.setAttribute('aria-expanded',open?'true':'false'); return} if(t.dataset.view){state.view=t.dataset.view; state.inspectId=null; renderAll(); return} if(t.dataset.slot){state.activeSlot=t.dataset.slot; state.view='library'; state.inspectId=null; renderSlots(); renderLeft(); if(!$('.tab[data-view=library]').classList.contains('active')){renderWorkspace();setTabs()} requestAnimationFrame(()=>document.getElementById('section-'+t.dataset.slot)?.scrollIntoView({block:'start'})); return} if(t.dataset.component){state.inspectId=t.dataset.component; state.activeSlot=compById(t.dataset.component).slot; renderSlots(); renderLeft(); return} if(t.dataset.equip){const c=compById(t.dataset.equip); current().loadout[c.slot]=c.id; state.activeSlot=c.slot; current().updatedAt=Date.now(); await persist(); renderSlots(); renderLeft(); refreshPasangpedCards(); renderBuildStrip(); toast(c.name+' equipped'); return} if(t.dataset.backLibrary!==undefined){state.inspectId=null; renderLeft(); return} if(t.dataset.preset){$('#buildMenu').classList.remove('open'); current().loadout={...PRESETS[t.dataset.preset]}; current().name=t.dataset.preset; current().hypothesis='Preset loadout — sesuaikan hipotesis ini sebelum digunakan sebagai klaim desain.'; current().updatedAt=Date.now(); await persist(); renderAll(); toast('Preset loaded'); return} if(t.dataset.build){$('#buildMenu').classList.remove('open'); const b=state.saved.find(x=>x.id===t.dataset.build); if(b){state.current=structuredClone(b); state.current._savedId=b.id; await persist(); renderAll()} return} if(t.dataset.replacePhoto){$('#replace-'+t.dataset.replacePhoto)?.click(); return} if(t.hasAttribute('data-close-inspect')){state.inspectId=null; renderLeft(); return} if(t.hasAttribute('data-close-modal')){closeModal(); return}});
 document.addEventListener('change', async e=>{ if(e.target.id?.startsWith('replace-')){const id=e.target.id.replace('replace-',''), file=e.target.files?.[0]; if(!file) return; state.imageOverrides[id]=await fileToDataURL(file,1400,.84); await persist(); renderAll(); toast('Foto diganti'); }});
-$('#newBuildBtn').onclick=async()=>{state.current={id:'current',name:'Untitled Build',hypothesis:'',status:'LOADOUT',loadout:{},sketch:null,createdAt:Date.now(),updatedAt:Date.now()}; state.version='0.6.2'; state.inspectId=null; await persist(); renderAll(); toast('Build baru siap')};
-$('#duplicateBtn').onclick=async()=>{const old=current(); state.current={...structuredClone(old),id:'current',name:(old.name||'Build')+' Copy',createdAt:Date.now(),updatedAt:Date.now()}; await persist(); renderAll(); toast('Build diduplikasi')};
+$('#newBuildBtn').onclick=async()=>{state.current={id:'current',name:'Untitled Build',hypothesis:'',status:'LOADOUT',loadout:{},sketch:null,createdAt:Date.now(),updatedAt:Date.now()}; state.current._savedId=null; state.version='0.6.3'; state.inspectId=null; await persist(); renderAll(); toast('Build baru siap')};
+$('#duplicateBtn').onclick=async()=>{const old=current(); state.current={...structuredClone(old),id:'current',_savedId:null,name:(old.name||'Build')+' Copy',createdAt:Date.now(),updatedAt:Date.now()}; await persist(); renderAll(); toast('Build diduplikasi — simpan sebagai build baru')};
 $('#editBuildBtn').onclick=openBuildModal;
-$('#saveBuildBtn').onclick=async()=>{const b=structuredClone(current()); if(!b.name || b.name==='Untitled Build'){openBuildModal(); toast('Beri nama build terlebih dahulu'); return} const existing=state.saved.findIndex(x=>x.id===b.id && b.id!=='current'); if(b.id==='current') b.id=uid(); if(existing>=0) state.saved[existing]=b; else {const byName=state.saved.findIndex(x=>x.name===b.name); if(byName>=0){b.id=state.saved[byName].id; state.saved[byName]=b}else state.saved.push(b)} state.current=structuredClone(b); await persist(); renderAll(); toast('Build disimpan')};
+$('#saveBuildBtn').onclick=async()=>{
+  const b=structuredClone(current());
+  if(!b.name || b.name==='Untitled Build'){openBuildModal(); toast('Beri nama build terlebih dahulu'); return}
+  const targetId=b._savedId || (b.id && b.id!=='current'?b.id:null);
+  const existing=targetId?state.saved.findIndex(x=>x.id===targetId):-1;
+  if(existing>=0){
+    b.id=state.saved[existing].id;
+    delete b._savedId;
+    state.saved[existing]=b;
+  }else{
+    b.id=uid();
+    delete b._savedId;
+    state.saved.push(b);
+  }
+  state.current=structuredClone(b);
+  await persist(); renderAll(); toast(existing>=0?'Build diperbarui':'Build baru disimpan');
+};
+$('#deleteBuildBtn').onclick=async()=>{
+  const targetId=current()._savedId || (current().id && current().id!=='current'?current().id:null);
+  if(!targetId){toast('Build ini belum tersimpan'); return}
+  const b=state.saved.find(x=>x.id===targetId);
+  if(!b){toast('Build tersimpan tidak ditemukan'); return}
+  if(!confirm(`Hapus build \"${b.name}\"?\n\nTindakan ini menghapus build dari daftar tersimpan. Foto/asset komponen tidak ikut terhapus.`)) return;
+  state.saved=state.saved.filter(x=>x.id!==targetId);
+  state.current={id:'current',name:'Untitled Build',hypothesis:'',status:'LOADOUT',loadout:{},sketch:null,createdAt:Date.now(),updatedAt:Date.now()};
+  state.current._savedId=null; state.inspectId=null;
+  await persist(); renderAll(); toast('Build dihapus');
+};
 $('#uploadSketchBtn').onclick=()=>$('#sketchFile').click(); $('#sketchFile').onchange=async e=>{const f=e.target.files?.[0]; if(!f) return; current().sketch=await fileToDataURL(f,2200,.88); if(current().status==='LOADOUT') current().status='SKETCHED'; await persist(); renderAll(); toast('Sketsa ditambahkan')};
 $('#removeSketchBtn').onclick=async()=>{current().sketch=null; await persist(); renderAll(); toast('Sketsa dihapus')};
 $('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='Morphological_Loadout_Project_v05.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('Project exported')};
-$('#publishStateBtn').onclick=()=>{const snapshot=structuredClone(state); snapshot._publishedAt=Date.now(); snapshot._localUpdatedAt=snapshot._publishedAt; snapshot.version='0.6.1'; const payload='// Auto-generated by Morphological Loadout V0.6.2\nwindow.MORPH_PUBLISHED_STATE = '+JSON.stringify(snapshot,null,2)+';\n'; const blob=new Blob([payload],{type:'text/javascript'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='published-state.js'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('Publish snapshot downloaded')};
+$('#publishStateBtn').onclick=()=>{const snapshot=structuredClone(state); snapshot._publishedAt=Date.now(); snapshot._localUpdatedAt=snapshot._publishedAt; snapshot.version='0.6.3'; const payload='// Auto-generated by Morphological Loadout V0.6.2\nwindow.MORPH_PUBLISHED_STATE = '+JSON.stringify(snapshot,null,2)+';\n'; const blob=new Blob([payload],{type:'text/javascript'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='published-state.js'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('Publish snapshot downloaded')};
 $('#importBtn').onclick=()=>$('#importFile').click(); $('#importFile').onchange=async e=>{const f=e.target.files?.[0]; if(!f) return; try{state=migrateToV06(JSON.parse(await f.text())); await persist(); renderAll(); toast('Project imported')}catch(err){alert('Import failed: '+err.message)}};
 $('#modalRoot').addEventListener('click', e=>{if(e.target.id==='modalRoot') closeModal()}); document.addEventListener('click',e=>{if(!e.target.closest('#buildSelectorWrap')){$('#buildMenu')?.classList.remove('open')} if(state.inspectId && !e.target.closest('#inspectOverlay') && !e.target.closest('[data-component]')){state.inspectId=null; renderLeft()}});
-(async function(){await loadPublishedSnapshot(); await restore(); if(state.view==='selection') state.view='build'; if(!state.libraryMode) state.libraryMode='large'; state.version='0.6.2'; renderAll()})();
+(async function(){await loadPublishedSnapshot(); await restore(); if(state.view==='selection') state.view='build'; if(!state.libraryMode) state.libraryMode='large'; state.version='0.6.3'; renderAll()})();
 </script></body></html>
